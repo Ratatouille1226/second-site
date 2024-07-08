@@ -95,4 +95,43 @@ window.addEventListener('DOMContentLoaded', () => {
 
     setClock('.timer', deadline);
 
+
+    //МОДАЛЬНЫЕ ОКНА
+    const modalTrigger = document.querySelectorAll('[data-modal]'),
+          modal = document.querySelector('.modal'),
+          modalCloseBtn = document.querySelector('[data-close]');
+
+    //Показываем модальное окно по клику на кнопку и запрещаем пользователю скроллить сайт
+    modalTrigger.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modal.classList.add('show');
+            modal.classList.remove('hide'); 
+            document.body.style.overflow = 'hidden'; 
+        });
+    })
+
+    //Переносим закрытие модального окна в функцию чтобы не дублировать код
+    function closeModal() {
+        modal.classList.add('hide');
+        modal.classList.remove('show'); 
+        document.body.style.overflow = ''; 
+    }
+
+    //Cкрываем модальное окно по клику на кнопку
+    modalCloseBtn.addEventListener('click', closeModal);
+
+    //Скрываем модальное окно если пользователь нажал не на крестик а на экран вокруг окна
+    modal.addEventListener('click', (e) => {
+        if (e.target == modal) {
+            closeModal();
+        }
+    });
+
+    //Cкрываем модальное окно по нажатию клавиши escape
+    document.addEventListener('keydown', (e) => {
+        if (e.code === "Escape" && modal.classList.contains('show')) {
+            closeModal();
+        }
+    });
+    
 });
