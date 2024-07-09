@@ -101,21 +101,26 @@ window.addEventListener('DOMContentLoaded', () => {
           modal = document.querySelector('.modal'),
           modalCloseBtn = document.querySelector('[data-close]');
 
+    //Переносим открытие модального окна в функцию чтобы не дублировать код     
+    function openModal() {
+        modal.classList.add('show');
+        modal.classList.remove('hide'); 
+        document.body.style.overflow = 'hidden'; 
+    //Отменяем автоматическое открытие модального окна если пользователь уже его открывал
+        clearInterval(modalTimerId);
+    };
+
     //Показываем модальное окно по клику на кнопку и запрещаем пользователю скроллить сайт
     modalTrigger.forEach(btn => {
-        btn.addEventListener('click', () => {
-            modal.classList.add('show');
-            modal.classList.remove('hide'); 
-            document.body.style.overflow = 'hidden'; 
-        });
-    })
+        btn.addEventListener('click', openModal);
+    });
 
     //Переносим закрытие модального окна в функцию чтобы не дублировать код
     function closeModal() {
         modal.classList.add('hide');
         modal.classList.remove('show'); 
         document.body.style.overflow = ''; 
-    }
+    };
 
     //Cкрываем модальное окно по клику на кнопку
     modalCloseBtn.addEventListener('click', closeModal);
@@ -133,5 +138,18 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
+
+    //Функция автоматического открытия модального окна через определенное время
+    const modalTimerId = setTimeout(openModal, 5000);
+
+    //Открываем модальное окно если пользователь долистал до конца сайта
+    function showModalByScroll() {
+        if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+            openModal();
+            window.removeEventListener('scroll', showModalByScroll);
+        }
+    };
+
+    window.addEventListener('scroll', showModalByScroll);
     
 });
