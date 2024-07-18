@@ -235,34 +235,34 @@ window.addEventListener('DOMContentLoaded', () => {
     statusMessage.textContent = message.loading;
     form.append(statusMessage)
 
-    //Отправляем в php
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-            request.setRequestHeader('content-type', 'application/json');
-            const formData = new FormData(form);
+    const formData = new FormData(form);
     //Помещаем данные в объект
     const object = {};
     formData.forEach(function(value, key) {
         object[key] = value;
     });
-    //Преобразовываем
-    const json = JSON.stringify(object)
 
-    //Отправляем данные
-            request.send(json);
-    //Отслеживем конечную загрузку нашего запроса
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    statusMessage.textContent = message.success;
-                //Удаляем оповещение о исходе события
-                    form.reset();
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 2000);
-                } else {
-                    statusMessage.textContent = message.failure;
-                }
-            });
+        //Отправляем в php
+        fetch('server.php', {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(object)
+        }).then(data => {
+            if (data.status === 200) {
+                statusMessage.textContent = message.success;
+                setTimeout(() => {
+                    statusMessage.remove();
+                }, 2000);
+            }
+        }).catch(() => {
+            statusMessage.textContent = message.failure;
+        }).finally(() => {
+            //Удаляем оповещение о исходе события
+            form.reset();
         });
+
+      });
     }
 });
