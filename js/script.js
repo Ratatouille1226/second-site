@@ -208,4 +208,61 @@ window.addEventListener('DOMContentLoaded', () => {
         '.menu.container'
     ).render();
 
+
+    //ОТПРАВКА ДАННЫХ НА СЕРВЕР
+    const forms = document.querySelectorAll('form');
+
+    //Исходы событий отправки данных
+    const message = {
+        loading: "Загрузка.",
+        success: "Спасибо, скоро мы с вами свяжемся!",
+        failure: "Произошла ошибка"
+    }
+
+    //Под каждую форму подвязываем обработчик события
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    //Функция отправки данных
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+    //Создаем блок оповещение
+    const statusMessage = document.createElement('div');
+    statusMessage.classList.add('status');
+    statusMessage.textContent = message.loading;
+    form.append(statusMessage)
+
+    //Отправляем в php
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+            request.setRequestHeader('content-type', 'application/json');
+            const formData = new FormData(form);
+    //Помещаем данные в объект
+    const object = {};
+    formData.forEach(function(value, key) {
+        object[key] = value;
+    });
+    //Преобразовываем
+    const json = JSON.stringify(object)
+
+    //Отправляем данные
+            request.send(json);
+    //Отслеживем конечную загрузку нашего запроса
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    statusMessage.textContent = message.success;
+                //Удаляем оповещение о исходе события
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        });
+    }
 });
