@@ -211,58 +211,74 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //ОТПРАВКА ДАННЫХ НА СЕРВЕР
     const forms = document.querySelectorAll('form');
-
-    //Исходы событий отправки данных
     const message = {
-        loading: "Загрузка.",
-        success: "Спасибо, скоро мы с вами свяжемся!",
-        failure: "Произошла ошибка"
-    }
+        loading: 'img/form/spinner.svg',
+        success: 'Спасибо! Скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
 
-    //Под каждую форму подвязываем обработчик события
     forms.forEach(item => {
         postData(item);
     });
 
-    //Функция отправки данных
     function postData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-    //Создаем блок оповещение
-    const statusMessage = document.createElement('div');
-    statusMessage.classList.add('status');
-    statusMessage.textContent = message.loading;
-    form.append(statusMessage)
+            let statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
+            `;
+            form.insertAdjacentElement('afterend', statusMessage);
+        
+            const formData = new FormData(form);
 
-    const formData = new FormData(form);
-    //Помещаем данные в объект
-    const object = {};
-    formData.forEach(function(value, key) {
-        object[key] = value;
-    });
+            const object = {};
+            formData.forEach(function(value, key){
+                object[key] = value;
+            });
 
-        //Отправляем в php
-        fetch('server.php', {
-            method: "POST",
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(object)
-        }).then(data => {
-            if (data.status === 200) {
-                statusMessage.textContent = message.success;
-                setTimeout(() => {
-                    statusMessage.remove();
-                }, 2000);
-            }
-        }).catch(() => {
-            statusMessage.textContent = message.failure;
-        }).finally(() => {
-            //Удаляем оповещение о исходе события
-            form.reset();
+            fetch('server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(object)
+            }).then(data => {
+                console.log(data);
+                showThanksModal(message.success);
+                statusMessage.remove();
+            }).catch(() => {
+                showThanksModal(message.failure);
+            }).finally(() => {
+                form.reset();
+            });
         });
-
-      });
     }
+
+    function showThanksModal(message) {
+        const prevModalDialog = document.querySelector('.modal__dialog');
+
+        prevModalDialog.classList.add('hide');
+        openModal();
+
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>×</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `;
+        document.querySelector('.modal').append(thanksModal);
+        setTimeout(() => {
+            thanksModal.remove();
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            closeModal();
+        }, 4000);
+    }
+    
 });
