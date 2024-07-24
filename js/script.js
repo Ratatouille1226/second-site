@@ -164,49 +164,49 @@ window.addEventListener('DOMContentLoaded', () => {
     
 
     //ИСПОЛЬЗУЕМ КЛАССЫ ДЛЯ КАРТОЧЕК МЕНЮ
-    class MenuCard {
-        constructor(src, alt, title, descr, price, parentSelector) {
-            this.src = src;
-            this.alt = alt;
-            this.title = title;
-            this.descr = descr;
-            this.price = price;
-            this.parent = document.querySelector(parentSelector);
-            this.transfer = 89;
-            this.changeToRub();
-        }
-    //Конвертация цены в рубли
-        changeToRub() {
-            return this.price * this.transfer;
-        }
-    //Динамически создаем карточки
-        render(){
-            const element = document.createElement('div');
-            element.innerHTML = `
-                <div class="menu__item">
-                    <img src=${this.src} alt=${this.alt}>
-                    <h3 class="menu__item-subtitle">${this.title}</h3>
-                    <div class="menu__item-descr">${this.descr}</div>
-                    <div class="menu__item-divider"></div>
-                    <div class="menu__item-price">
-                        <div class="menu__item-cost">Цена:</div>
-                        <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
-                    </div>
-                </div>
-            `;
-    //Помещаем элемент на страницу
-            this.parent.append(element);
-        };
-    }
-    //Заполнение карточки
-    new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        229,
-        '.menu.container'
-    ).render();
+    // class MenuCard {
+    //     constructor(src, alt, title, descr, price, parentSelector) {
+    //         this.src = src;
+    //         this.alt = alt;
+    //         this.title = title;
+    //         this.descr = descr;
+    //         this.price = price;
+    //         this.parent = document.querySelector(parentSelector);
+    //         this.transfer = 89;
+    //         this.changeToRub();
+    //     }
+    // //Конвертация цены в рубли
+    //     changeToRub() {
+    //         return this.price * this.transfer;
+    //     }
+    // //Динамически создаем карточки
+    //     render(){
+    //         const element = document.createElement('div');
+    //         element.innerHTML = `
+    //             <div class="menu__item">
+    //                 <img src=${this.src} alt=${this.alt}>
+    //                 <h3 class="menu__item-subtitle">${this.title}</h3>
+    //                 <div class="menu__item-descr">${this.descr}</div>
+    //                 <div class="menu__item-divider"></div>
+    //                 <div class="menu__item-price">
+    //                     <div class="menu__item-cost">Цена:</div>
+    //                     <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+    //                 </div>
+    //             </div>
+    //         `;
+    // //Помещаем элемент на страницу
+    //         this.parent.append(element);
+    //     };
+    // }
+    // //Заполнение карточки
+    // new MenuCard(
+    //     "img/tabs/vegy.jpg",
+    //     "vegy",
+    //     'Меню "Фитнес"',
+    //     'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+    //     229,
+    //     '.menu.container'
+    // ).render();
 
 
     //ОТПРАВКА ДАННЫХ НА СЕРВЕР
@@ -280,5 +280,58 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }, 4000);
     }
+
+
+    //СЛАЙДЕР
+    const slides = document.querySelectorAll('.offer__slide'),
+          prev = document.querySelector('.offer__slider-prev'),
+          next = document.querySelector('.offer__slider-next'),
+          total = document.querySelector('#total'),
+          current = document.querySelector('#current');
+    //Текущее положение слайдера
+    let slideIndex = 1;
+
+    //Правильное отображение счётчика слайдов
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
     
+    showSlide(slideIndex);
+    //Отображение слайдов
+    function showSlide(n) {
+    //Условия на показ слайдов если счётчик выше или меньше допустимых значений
+        if (n > slides.length) {
+            slideIndex = 1;
+        }
+
+        if (n < 1) {
+            slideIndex = slides.length;
+        }
+    //Скрываем все элементы и показываем один
+        slides.forEach(item => item.style.display = 'none');
+        slides[slideIndex - 1].style.display = 'block';
+
+    //Правильное отображение счётчика слайдов
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slides.length;
+        }
+    };
+
+    //Смена значений слайдера
+    function plusSlides(n) {
+        showSlide(slideIndex += n);
+    }
+    //Листаем слайд назад
+    prev.addEventListener('click', () => {
+        plusSlides(-1);
+    });
+     //Листаем слайд вперёд
+     next.addEventListener('click', () => {
+        plusSlides(1);
+   
+    });
 });
