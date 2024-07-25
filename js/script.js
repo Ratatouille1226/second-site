@@ -150,7 +150,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     //Функция автоматического открытия модального окна через определенное время
-    const modalTimerId = setTimeout(openModal, 5000);
+    // const modalTimerId = setTimeout(openModal, 5000);
 
     //Открываем модальное окно если пользователь долистал до конца сайта
     function showModalByScroll() {
@@ -334,4 +334,79 @@ window.addEventListener('DOMContentLoaded', () => {
         plusSlides(1);
    
     });
+
+
+
+    //КАЛЬКУЛЯТОР
+    const result = document.querySelector('.calculating__result span');
+    //Сразу записал значение пола и рэтио чтобы изначально уже были привязаны какие-то значения для счёта (если у пользователя совпадают разделы и он не догадается нажать на них повторно)
+    let sex = "female", 
+        height, weight, age, 
+        ratio = 1.375;
+
+    function calcTotal() {
+    //Проверяем на заполненность ячеек
+        if (!sex || !height || !weight || !age || !ratio) {
+            result.textContent = '____';
+            return;
+        }
+    //Рачитываем норму калорий для женщин
+        if (sex === "female") {
+            result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+        } else {
+            result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+        }
+    };
+    calcTotal();
+
+    function getStaticInformation(parentSelector, activeClass) {
+        const elements = document.querySelectorAll(`${parentSelector} div`);
+    //Проверяем куда нажал пользователь раздел с полом или активностью и помещаем в переменную
+        elements.forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                if (e.target.getAttribute('data-ratio')) {
+                    ratio = +e.target.getAttribute('data-ratio');
+                } else {
+                    sex = e.target.getAttribute('id');
+                }
+    //Удаляем класс активности и добавляем его по клику на определнный раздел
+                elements.forEach(elem => elem.classList.remove(activeClass));
+                e.target.classList.add(activeClass);
+
+                calcTotal();
+            });
+        });
+    };
+    getStaticInformation('#gender', 'calculating__choose-item_active');
+    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+
+    function getDynamicInformation(selector) {
+        const input = document.querySelector(selector);
+
+        input.addEventListener('input', () => {
+    //Проверяем ввёл ли пользователь буквы в инпут
+            if (input.value.match(/\D/g)) {
+                input.style.border = '2px solid red';
+            } else {
+                input.style.border = 'none';
+            }
+    //Проверяем в какую ячейку пользователь вводит данные и записываем их в переменную
+            switch(input.getAttribute('id')) {
+                case 'height':
+                    height = +input.value;
+                        break;
+                case 'weight':
+                    weight = +input.value;
+                        break;
+                case 'age':
+                    age = +input.value;
+                        break
+            };
+            calcTotal();
+        });
+    };
+    getDynamicInformation('#height');
+    getDynamicInformation('#weight');
+    getDynamicInformation('#age');
+
 });
